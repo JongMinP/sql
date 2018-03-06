@@ -1,0 +1,68 @@
+
+drop table pet;
+
+-- table 생성
+create table pet(
+	name varchar(20),
+    owner varchar(20),
+    species varchar(20),
+    gender char(1),
+    birth date,
+    death date
+);
+
+-- schema 확인
+desc pet;
+
+-- row 확인
+select * from pet;
+
+-- 데이터 넣기
+insert 
+	into pet 
+values ('fluffy','안대혁','개','m','2010-11-18',null);
+
+load data local infile 'c:\\Temp\\pet.txt' into table pet;
+
+select * from pet;
+select * from pet where name ='Bowser';
+select * from pet 
+where birth >= '1998-01-01' and birth <= '1998-12-31'; 
+
+select * from pet
+-- where birth LIKE '1998%';
+where birth LIKE '1998-__-__';
+
+select name, birth from pet
+order by birth;
+
+delete from pet where gender is null;
+
+-- update
+update pet
+	set death = null
+where death = '0000-00-00';
+
+-- 살아있는 동물
+select * 
+	from pet
+where death is null;
+
+select * from pet 
+where name LIKE '%w%';
+
+select *
+from pet
+where name LIKE '_____';
+
+select name,owner from pet;
+
+select owner,count(*) count
+from pet
+group by owner -- group by select 절 맞추기 
+having count > 2;
+
+select max(a.cnt)
+from (select owner,count(*) cnt from pet group by owner) a;
+
+
