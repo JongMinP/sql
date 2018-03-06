@@ -13,7 +13,7 @@ order by hire_date asc;
 
 -- 3
 
-select count(gender) '여직원 남직원 수'
+select gender, count(gender) '여직원 남직원 수'
 from employees
 group by gender;
 
