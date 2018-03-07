@@ -1,0 +1,256 @@
+-- 집계 통계 문제
+
+-- 문제 1
+
+select max(salary) '최고임금' , min(salary) '최저임금' , max(salary) - min(salary) '최고임금 - 최저임금'
+from salaries;
+
+-- 문제 2
+
+select date_format(max(hire_date),concat('%Y','년 ', '%m', '월 ' , '%d' , '일' ))
+from employees;
+
+-- 문제 3
+
+select date_format(min(hire_date),concat('%Y','년 ', '%m', '월 ' , '%d' , '일' ))
+from employees;
+
+
+-- 문제 4
+select avg(salary)
+from salaries;
+
+-- 문제 5
+
+select max(salary) '최고', min(salary) '최저'
+from salaries;
+
+-- 문제 6
+-- select period_diff(cast(now() as date),cast(min(birth_date) as date)) , min(birth_date)
+-- from employees;
+
+
+-- select cast(now() as date);
+-- select period_diff(date_format(now(),'%Y') ,date_format(min(birth_date),'%Y'))
+-- from employees;
+
+-- select date_format(now(),'%Y') ;
+
+select date_format(now(),'%Y') - date_format(max(birth_date),'%Y') 어린나이, 
+	date_format(now(),'%Y') - date_format(min(birth_date),'%Y') 연장자  
+from employees;
+
+-- 조인 문제
+-- 문제 1
+select e.emp_no, concat(e.first_name,' ',e.last_name) 'name', salary
+from employees e, salaries s
+where e.emp_no = s.emp_no
+order by salary desc;
+
+-- 문제 2
+select e.emp_no, concat(e.first_name,' ',e.last_name) 'name', t.title
+from employees e, titles t
+where e.emp_no = t.emp_no and t.to_date = '9999-01-01'
+order by name asc;
+
+
+-- 문제 3
+select e.emp_no, concat(e.first_name,' ',e.last_name) 'name', d.dept_name 
+from employees e, dept_emp de, departments d
+where e.emp_no = de.emp_no
+and de.dept_no = d.dept_no and de.to_date = '9999-01-01'
+order by name asc;
+
+-- 문제 4
+
+select e.emp_no , concat(e.first_name,' ',e.last_name) 'name' , salary, t.title, d.dept_name 
+from employees e, salaries s, titles t, dept_emp de , departments d
+where e.emp_no = s.emp_no 
+and e.emp_no = t.emp_no and e.emp_no = de.emp_no and de.dept_no = d.dept_no
+and de.to_date = '9999-01-01'
+order by name asc;
+
+-- 문제 5
+
+select e.emp_no , concat(e.first_name,' ',e.last_name) 'name'
+from employees e, titles t
+where e.emp_no = t.emp_no 
+and t.from_date <> '9999-01-01' and t.title = 'Technique Leader';
+ 
+-- 문제 6
+select e.last_name , d.dept_name, t.title
+from employees e, dept_emp de, departments d, titles t
+where e.emp_no = de.emp_no
+and de.dept_no = d.dept_no
+and e.emp_no = t.emp_no
+and e.last_name LIKE 'S%';
+
+
+-- 문제 7
+select distinct concat(e.first_name,' ',e.last_name) 'name', s.salary, t.to_date
+from employees e, titles t , salaries s
+where e.emp_no = t.emp_no
+and e.emp_no = s.emp_no
+and t.title = 'Engineer'
+and s.salary >= 40000 and s.to_date = '9999-01-01'
+order by salary desc;
+
+-- 문제 8
+select t.title , max(salary) sal
+from employees e, titles t , salaries s
+where e.emp_no = t.emp_no 
+and e.emp_no = s.emp_no
+and s.to_date = '9999-01-01'
+and s.salary > 50000
+group by t.title
+order by sal desc;
+
+-- 문제 9
+select d.dept_no , d.dept_name , avg(s.salary) 'avg_sal'
+from departments d , dept_emp de , employees e, salaries s
+where d.dept_no = de.dept_no and de.emp_no = e.emp_no
+and e.emp_no = s.emp_no and s.to_date = '9999-01-01'
+group by d.dept_no
+order by avg_sal desc;
+
+-- 문제 10
+
+select t.title ,avg(s.salary) 'avg_sal'
+from employees e, titles t, salaries s
+where e.emp_no = t.emp_no 
+and e.emp_no = s.emp_no
+and s.to_date = '9999-01-01'
+group by t.title
+order by avg_sal desc;
+
+-- 서브 쿼리
+
+-- 문제 1
+
+select count(*)
+from employees e , salaries s
+where e.emp_no = s.emp_no
+and s.to_date = '9999-01-01'
+and s.salary > (select avg(s.salary)
+from salaries s where s.to_date = '9999-01-01');
+
+
+-- 문제 2 
+select d.dept_no,max(s.salary) 'sal'
+from employees e, salaries s , dept_emp d
+where e.emp_no = s.emp_no
+and e.emp_no = d.emp_no
+and s.to_date = '9999-01-01'
+group by d.dept_no
+order by sal desc;
+
+
+
+-- 문제 3
+
+select e.emp_no , concat(e.first_name,' ',e.last_name) 'name'  , s.salary
+from (select d.dept_no 'dno' , avg(s.salary) 'sal'
+from employees e, salaries s, dept_emp d
+where e.emp_no = s.emp_no
+and e.emp_no = d.emp_no
+and s.to_date = '9999-01-01'
+group by d.dept_no) a , employees e , salaries s, dept_emp d
+where a.dno = d.dept_no 
+and e.emp_no = d.emp_no
+and e.emp_no = s.emp_no
+and s.to_date = '9999-01-01'
+and s.salary >a.sal;
+
+
+
+
+
+
+
+
+-- 문제 4
+select e.emp_no , concat(e.first_name,' ',e.last_name) 'name' , m. , d.dept_no
+from employees e, dept_manager m , departments d
+where e.emp_no = m.emp_no
+and m.dept_no = d.dept_no
+and m.to_date = '9999-01-01';
+
+
+select *
+from employees e, dept_manager m
+where e.emp_no = m.emp_no
+and m.emp_no IN (select e.emp_no
+from employees e, dept_manager m , titles t
+where e.emp_no = m.emp_no 
+and e.emp_no = t.emp_no
+and t.title = 'Manager'
+and m.to_date = '9999-01-01');
+
+-- 5
+
+select  dept_no,round(avg(s.salary)) 'avgsal' 
+from employees e, salaries s , dept_emp d
+where e.emp_no = s.emp_no 
+and e.emp_no = d.emp_no
+and s.to_date = '9999-01-01'
+group by d.dept_no;
+
+-- 6 //
+select de.dept_no
+from employees e, dept_emp de , salaries s
+where e.emp_no = de.emp_no
+and e.emp_no = s.emp_no 
+group by de.dept_no
+having (round(avg(s.salary))) 
+= (select round(max(a.sal))
+from (select de.dept_no 'dno', avg(s.salary) 'sal'
+from employees e, dept_emp de , salaries s
+where e.emp_no = de.emp_no
+and e.emp_no = s.emp_no
+group by de.dept_no) a);
+
+
+-- 7 
+select t.title
+from employees e, salaries s, titles t
+where e.emp_no = t.emp_no
+and e.emp_no = s.emp_no 
+group by t.title
+having (round(avg(s.salary))) 
+= (select round(max(a.sal))
+from (select avg(s.salary) 'sal'
+from employees e, titles t , salaries s
+where e.emp_no = t.emp_no
+and e.emp_no = s.emp_no
+group by t.title) a);
+
+-- 8  x
+select *
+from employees e, dept_emp d
+where e.emp_no = d.emp_no
+and (e.emp_no,d.dept_no) 
+= (select ee.emp_no, de.dept_no
+from dept_manager de , departments e, employees ee , titles t
+where de.dept_no  = e.dept_no
+and ee.emp_no = de.emp_no 
+and t.emp_no = ee.emp_no
+and t.title ='Manager');
+
+
+
+select *
+from (select ee.emp_no 'eno', de.dept_no 'dno'
+from dept_manager de , departments e, employees ee , titles t
+where de.dept_no  = e.dept_no
+and ee.emp_no = de.emp_no 
+and t.emp_no = ee.emp_no
+and t.title ='Manager' 
+and t.to_date = '9999-01-01') a , employees b, dept_emp d
+where a.eno = b.emp_no 
+and a.dno = dept_no 
+and b.emp_no = d.emp_no;
+
+
+
+
+
