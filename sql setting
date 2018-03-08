@@ -1,0 +1,35 @@
+mysql -u root -p
+
+
+show databases;
+use mysql;
+show tables;
+
+create database employees; db 생성
+create user 'hr'@'localhost' identified by 'hr'; 계정생성
+grant all privileges on employees.* to 'hr'@'localhost'; 권한 부여
+
+
+mysql -u hr -D employees -p
+
+mysql -u hr -D employees -p -t < employees.sql 데이터추가
+
+
+workbench는 root접근 제한 (리눅스도 root 제한)
+
+shell로 접근해야 됨
+
+
+
+DML
+
+(C) insert
+(R) select
+(U) update
+(D) delete
+
+기본(where,order by)
+집계(group by,having)
+조인
+서브쿼리
+
